@@ -105,7 +105,7 @@ WHERE id_karyawan = 2;
 DELETE FROM gaji  WHERE id_karyawan = 10 AND bulan = 10 AND tahun = 2023;
 
 -- 4.
-SELECT COUNT(*) FROM  karyawan WHERE jenis_kelamin = "L";
+SELECT COUNT(*) as jumlah_karyawan FROM  karyawan WHERE jenis_kelamin = "L";
 
 -- 5.
 SELECT SUM(gaji_pokok) as total_gaji FROM karyawan
@@ -113,21 +113,67 @@ LEFT JOIN jabatan on karyawan.id_jabatan = jabatan.id_jabatan
 WHERE nama_jabatan = "Supervisor";
 
 -- 6.
-SELECT AVG(tunjangan) FROM gaji WHERE bulan = 10 AND tahun = 2023;
+SELECT AVG(tunjangan) as rata_rata_tunjangan FROM gaji WHERE bulan = 10 AND tahun = 2023;
 
 -- 7.
-SELECT count(karyawan.id_karyawan) FROM karyawan
+SELECT count(karyawan.id_karyawan) as total_kehadiran FROM karyawan
 JOIN absensi ON karyawan.id_karyawan = absensi.id_absensi;
 
 -- 8.
-SELECT COUNT(nama) as jenis_kelamin FROM karyawan GROUP BY jenis_kelamin;
+SELECT jenis_kelamin, COUNT(nama) as jumlah_karyawan FROM karyawan GROUP BY jenis_kelamin;
 
 -- 9.
-SELECT SUM(jabatan.gaji_pokok) FROM jabatan 
-JOIN karyawan on jabatan.id_jabatan = karyawan.id_jabatan;
+SELECT SUM(jabatan.gaji_pokok) as total_gaji_pokok FROM jabatan
+JOIN karyawan ON jabatan.id_jabatan = karyawan.id_jabatan
 
 -- 10.
-SELECT karyawan.nama,SUM(gaji.total_gaji)
+SELECT karyawan.nama as nama_karyawan, gaji.total_gaji
 FROM gaji
-JOIN karyawan ON absensi.id_karyawan = karyawan.id_karyawan
-JOIN absensi ON karyawan.id_karyawan = absensi.id_karyawan;
+JOIN karyawan ON gaji.id_karyawan = karyawan.id_karyawan WHERE bulan = 10 AND tahun = 2023 LIMIT 1;
+
+-- 11.
+SELECT karyawan.nama as nama_karyawan, jabatan.nama_jabatan FROM jabatan
+JOIN karyawan ON jabatan.id_jabatan = karyawan.id_jabatan;
+
+-- 12.
+SELECT karyawan.nama, jabatan.gaji_pokok , gaji.tunjangan FROM karyawan
+LEFT JOIN gaji ON karyawan.id_karyawan = gaji.id_karyawan
+LEFT JOIN jabatan ON karyawan.id_jabatan = jabatan.id_jabatan WHERE bulan = 10 AND tahun = 2023;
+
+-- 13.
+SELECT karyawan.nama as nama_karyawan FROM karyawan
+LEFT JOIN absensi ON karyawan.id_karyawan = absensi.id_karyawan;
+
+-- 14.
+SELECT karyawan.nama as nama_karyawan, SUM(jumlah_absensi) FROM karyawan 
+JOIN gaji on karyawan.id_karyawan = gaji.id_karyawan GROUP BY nama
+ 
+-- 15.
+SELECT karyawan.nama as nama_karyawan, gaji.total_gaji FROM karyawan 
+JOIN gaji ON karyawan.id_karyawan = gaji.id_karyawan WHERE bulan = 10 AND tahun = 2023 ORDER BY total_gaji DESC;
+
+-- 16.
+select nama_jabatan, SUM(gaji_pokok) from jabatan 
+join karyawan on jabatan.id_jabatan = karyawan.id_jabatan GROUP BY nama_jabatan;
+
+-- 17.
+SELECT karyawan.nama as nama_karyawan, jabatan.nama_jabatan, gaji.total_gaji FROM karyawan 
+JOIN gaji ON karyawan.id_karyawan = gaji.id_karyawan 
+JOIN jabatan ON karyawan.id_jabatan = jabatan.id_jabatan
+WHERE bulan = 10 AND tahun = 2023 ORDER BY total_gaji DESC;
+
+-- 18.
+SELECT karyawan.nama as nama_karyawan, jabatan.nama_jabatan, count(absensi.id_absensi) as total_hadir from karyawan
+join absensi on karyawan.id_karyawan = absensi.id_karyawan
+join jabatan on karyawan.id_jabatan = jabatan.id_jabatan GROUP BY nama;
+
+-- 19.
+SELECT jabatan.nama_jabatan, SUM(gaji.tunjangan) as total_tunjangan from karyawan
+join jabatan on karyawan.id_jabatan = jabatan.id_jabatan
+JOIN gaji on karyawan.id_karyawan = gaji.id_karyawan GROUP BY nama_jabatan
+
+-- 20. 
+SELECT jabatan.nama_jabatan, AVG(gaji.total_gaji) as rata_rata_total_gaji from karyawan
+join jabatan on karyawan.id_jabatan = jabatan.id_jabatan
+JOIN gaji on karyawan.id_karyawan = gaji.id_karyawan GROUP BY nama_jabatan ASC;
+drop TABLE karyawan
